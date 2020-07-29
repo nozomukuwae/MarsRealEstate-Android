@@ -30,6 +30,8 @@ enum class  MarsApiStatus { LOADING, ERROR, DONE }
  * The [ViewModel] that is attached to the [OverviewFragment].
  */
 class OverviewViewModel : ViewModel() {
+    private var job = Job()
+    private val apiScope = CoroutineScope(Dispatchers.Default + job)
 
     // The internal MutableLiveData String that stores the status of the most recent request
     private val _status = MutableLiveData<MarsApiStatus>()
@@ -42,8 +44,10 @@ class OverviewViewModel : ViewModel() {
     val properties: LiveData<List<MarsProperty>>
         get() = _properties
 
-    private var job = Job()
-    private val apiScope = CoroutineScope(Dispatchers.Default + job)
+    private val _navigateToDetail = MutableLiveData<MarsProperty>()
+    val navigateToDetail: LiveData<MarsProperty>
+        get() = _navigateToDetail
+
     /**
      * Call getMarsRealEstateProperties() on init so we can display status immediately.
      */
@@ -75,5 +79,13 @@ class OverviewViewModel : ViewModel() {
                 }
             }
         }
+    }
+
+    fun displayPropertyDetail(marsProperty: MarsProperty) {
+        _navigateToDetail.value = marsProperty
+    }
+
+    fun displayPropertyDetailCompleted() {
+        _navigateToDetail.value = null
     }
 }
